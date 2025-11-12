@@ -1,0 +1,48 @@
+
+# Function to solve Fractional Knapsack Problem
+def fractional_knapsack(values, weights, capacity):
+    n = len(values)
+    
+    # Calculate value/weight ratio for each item
+    ratio = [(values[i] / weights[i], i) for i in range(n)]
+    
+    # Sort items by ratio in decreasing order
+    ratio.sort(reverse=True)
+    
+    total_value = 0
+    fractions = [0] * n  # Fraction of each item taken
+
+    for r, i in ratio:
+        if weights[i] <= capacity:
+            # Take the whole item
+            fractions[i] = 1
+            total_value += values[i]
+            capacity -= weights[i]
+        else:
+            # Take fractional part
+            fractions[i] = capacity / weights[i]
+            total_value += values[i] * fractions[i]
+            capacity = 0
+            break  # Knapsack is full
+
+    return total_value, fractions
+
+# Example Usage with User Input
+n = int(input("Enter number of items: "))
+values = []
+weights = []
+
+for i in range(n):
+    v = float(input(f"Enter value of item {i+1}: "))
+    w = float(input(f"Enter weight of item {i+1}: "))
+    values.append(v)
+    weights.append(w)
+
+capacity = float(input("Enter capacity of knapsack: "))
+
+total_value, fractions = fractional_knapsack(values, weights, capacity)
+
+print(f"\nMaximum value that can be obtained: {total_value:.2f}")
+print("Fractions of items taken:")
+for i in range(n):
+    print(f"Item {i+1}: {fractions[i]:.2f}")
