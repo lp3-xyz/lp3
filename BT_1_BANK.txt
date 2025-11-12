@@ -1,33 +1,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract StudentData {
+contract Bank {
+    mapping(address => uint256) private balanceOf;
 
-    struct Student {
-        uint id;
-        string name;
-        uint age;
+    event Deposit(address indexed account, uint256 amount);
+    event Withdraw(address indexed account, uint256 amount);
+
+    function deposit() public payable {
+        require(msg.value > 0, "Deposit amount must be greater than zero");
+        balanceOf[msg.sender] += msg.value;
+        emit Deposit(msg.sender, msg.value);
     }
 
-    Student[] public students;
+    function withdraw(uint256 amount) public {
+        require(amount > 0, "Withdraw amount must be greater than zero");
+        require(balanceOf[msg.sender] >= amount, "Insufficient balance");
 
-    function addStudent(uint _id, string memory _name, uint _age) public {
-        students.push(Student(_id, _name, _age));
+        balanceOf[msg.sender] -= amount;
+        payable(msg.sender).transfer(amount);
+        emit Withdraw(msg.sender, amount);
     }
 
-    function getTotalStudents() public view returns(uint) {
-        return students.length;
+    function showBalance() public view returns (uint256) {
+        return balanceOf[msg.sender];
     }
-
-    // To accept Ether directly
-    receive() external payable {
-    }
-
-    // Optional fallback for unknown function calls
-    fallback() external payable {
-    }
-
-    function getBalance() public view returns(uint) {
-        return address(this).balance;
-    }
+    
 }
